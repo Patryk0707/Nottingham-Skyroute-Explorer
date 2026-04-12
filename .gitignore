@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+#Additonally Added
+**/x64/
+**/Debug/
+**/Release/
+**/ipch/
+**/.vs/
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
