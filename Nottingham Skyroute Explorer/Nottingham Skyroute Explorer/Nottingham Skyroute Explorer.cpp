@@ -34,9 +34,10 @@ void Menu::displayMainMenu(){
 	std::cout << "7. Advanced options(radius search, nearest airport, high / low elevation,sort etc.)" << std::endl;
 	std::cout << "8. Exit" << std::endl;
 	std::cin >> userChoice;
+	std::cin.ignore();
 	switch (userChoice) {
 		case 7:
-			Menu::displayAdditonalMenu;
+			Menu::displayAdditonalMenu();
 		case 8:
 			exit;
 		default:
