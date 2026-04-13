@@ -5,7 +5,7 @@ public:
 	static int readCSV();
 };
 int CSVFile::readCSV() {
-	std::ifstream airports("airports.csv");
+	std::ifstream airports("../airports.csv");
 	if (airports.is_open()) {
 		std::cout << "File read successfully";
 	}
