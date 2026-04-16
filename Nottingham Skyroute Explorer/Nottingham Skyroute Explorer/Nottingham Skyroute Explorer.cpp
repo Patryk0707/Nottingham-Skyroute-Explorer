@@ -24,16 +24,24 @@ public:
 
 void Menu::displayMainMenu(){
 	int userChoice;
-	std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
-	std::cout << "1. Search airports by country" << std::endl;
-	std::cout << "2. Search airports by name" << std::endl;
-	std::cout << "3. Search by IATA code" << std::endl;
-	std::cout << "4. Count airports by type" << std::endl;
-	std::cout << "5. Add a new airport" << std::endl;
-	std::cout << "6. Save changes" << std::endl;
-	std::cout << "7. Advanced options(radius search, nearest airport, high / low elevation,sort etc.)" << std::endl;
-	std::cout << "8. Exit" << std::endl;
-	std::cin >> userChoice;
+	while(true) {
+		std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
+		std::cout << "1. Search airports by country" << std::endl;
+		std::cout << "2. Search airports by name" << std::endl;
+		std::cout << "3. Search by IATA code" << std::endl;
+		std::cout << "4. Count airports by type" << std::endl;
+		std::cout << "5. Add a new airport" << std::endl;
+		std::cout << "6. Save changes" << std::endl;
+		std::cout << "7. Advanced options(radius search, nearest airport, high / low elevation,sort etc.)" << std::endl;
+		std::cout << "8. Exit" << std::endl;
+		std::cin >> userChoice;
+		while (std::cin.fail()) {
+			std::cin.clear();
+			std::cin.ignore(1000,'\n');
+			std::cout<<"Invalid input, Please input a number";
+			std::cin >> userChoice;
+		}
+		
 	std::cin.ignore();
 	switch (userChoice) {
 		case 7:
@@ -45,6 +53,7 @@ void Menu::displayMainMenu(){
 			
 
 	}
+	}
 }
 
 void Menu::displayAdditonalMenu() {
@@ -53,11 +62,6 @@ void Menu::displayAdditonalMenu() {
 	std::cout << "1. radius search" << std::endl;
 	std::cout << "2. nearest airport" << std::endl;
 	std::cout << "3. sort airports" << std::endl;
-	std::cout << "4. Count airports by type" << std::endl;
-	std::cout << "5. Add a new airport" << std::endl;
-	std::cout << "6. Save changes" << std::endl;
-	std::cout << "7. Advanced options(radius search, nearest airport, high / low elevation,sort etc.)" << std::endl;
-	std::cout << "8. Exit" << std::endl;
 	std::cin >> userChoice;
 }
 
