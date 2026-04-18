@@ -34,22 +34,26 @@ void Menu::displayMainMenu(){
 		std::cout << "6. Save changes" << std::endl;
 		std::cout << "7. Advanced options(radius search, nearest airport, high / low elevation,sort etc.)" << std::endl;
 		std::cout << "8. Exit" << std::endl;
+		std::cout<< "Enter a number:";
 		std::cin >> userChoice;
 		while (std::cin.fail()) {
 			std::cin.clear();
 			std::cin.ignore(1000,'\n');
-			std::cout<<"Invalid input, Please input a number";
+			std::cout<<"Invalid input, Please input a number:";
+			std::cin >> userChoice;
+		}
+		while (userChoice > 8 or userChoice<1) {
+			std::cin.ignore();
+			std::cout << "Please enter a number within 1-8";
 			std::cin >> userChoice;
 		}
 		
-	std::cin.ignore();
 	switch (userChoice) {
 		case 7:
 			Menu::displayAdditonalMenu();
 		case 8:
-			exit;
-		default:
-			Menu::displayMainMenu();
+			exit(0);
+
 			
 
 	}
