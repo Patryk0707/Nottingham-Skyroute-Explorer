@@ -73,13 +73,22 @@ std::string airport::getCoordinates() const { return coordinates; }
 class airportRepository {
 	public:
 		void loadFromCSV();
-		std::multimap<std::string,airport> searchAirportByCountry() const;
+		std::multimap<std::string,airport> searchAirportByCountry(const std::string& country) const;
 	private:
 		std::vector<airport>airports;
 };
-std::multimap<std::string, airport> airportRepository::searchAirportByCountry() const {
-	return{};
+std::multimap<std::string, airport> airportRepository::searchAirportByCountry(const std::string& country) const {
+    std::multimap<std::string, airport> result;
+
+    for (const auto& a : airports) {
+        if (a.getIsoCountry() == country) {
+            result.insert({ a.getIsoCountry(), a });
+        }
+    }
+
+    return result;
 }
+
 void airportRepository::loadFromCSV(){
 	std::ifstream airportsFile("../airports.csv"); //opens the CSV file and uses ../ to check for the file a folder before the x64 folder
 	std::string line;
@@ -158,25 +167,47 @@ void Menu::displayMainMenu(airportRepository& repo) {//new
 		}
 
 		switch (userChoice) {
-		case 1:
-			repo.searchAirportByCountry();//new and breaks
+		case 1:{
+			std::string countryInput;
+			std::cout << "Enter country code such as 'US' to find airports within that country: ";
+			while (true){
+				std::cin>>countryInput;
+				if(countryInput=="exit")
+					break;
+				auto results = repo.searchAirportByCountry(countryInput);
+				if (results.empty()) {
+					std::cout << "No airports matching the country code. Try again or type 'exit' to return to the main menu.";
+					continue;
+				}
+				for (const auto& entry : results) {
+					std::cout << entry.second.getName() << "\n";
+				}
+				break;
+			}
 			break;
-		case 2:
+		}
+		case 2:{
 			break;
-		case 3:
+			}
+		case 3:{
 			break;
-		case 4:
+			}
+		case 4:{
 			break;
-		case 5:
+			}
+		case 5:{
 			break;
-		case 6:
+			}
+		case 6:{
 			break;
-		case 7:
+			}
+		case 7:{
 			Menu::displayAdditonalMenu();
 			break;
-		case 8:
+			}
+		case 8:{
 			exit(0);
-
+			}
 
 
 		}
