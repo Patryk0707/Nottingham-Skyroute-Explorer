@@ -74,6 +74,7 @@ class airportRepository {
 	public:
 		void loadFromCSV();
 		std::multimap<std::string,airport> searchAirportByCountry(const std::string& country) const;
+		std::multimap<std::string, airport> searchAirportByName(const std::string& name) const;
 	private:
 		std::vector<airport>airports;
 };
@@ -85,7 +86,16 @@ std::multimap<std::string, airport> airportRepository::searchAirportByCountry(co
             result.insert({ a.getIsoCountry(), a });
         }
     }
+	return result;
+}
+std::multimap<std::string, airport> airportRepository::searchAirportByName(const std::string& name) const {
+    std::multimap<std::string, airport> result;
 
+    for (const auto& a : airports) {
+		if (a.getName().find(name) != std::string::npos){
+			result.insert({ a.getName(), a });
+        }
+    }
     return result;
 }
 
@@ -136,11 +146,11 @@ void airportRepository::loadFromCSV(){
 //new end
 class Menu {
 public:
-	static void displayMainMenu(airportRepository& repo);//new
+	static void displayMainMenu(airportRepository& repo);
 	static void displayAdditonalMenu();
 };
 
-void Menu::displayMainMenu(airportRepository& repo) {//new
+void Menu::displayMainMenu(airportRepository& repo) {
 	int userChoice;
 	while (true) {
 		std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
@@ -187,6 +197,22 @@ void Menu::displayMainMenu(airportRepository& repo) {//new
 			break;
 		}
 		case 2:{
+			std::string nameInput;
+			std::cout << "Enter a airport name to find any matches: ";
+			while (true) {
+				std::cin >> nameInput;
+				if (nameInput == "exit")
+					break;
+				auto results = repo.searchAirportByName(nameInput);
+				if (results.empty()) {
+					std::cout << "No airports matching that name. Try again or type 'exit' to return to the main menu.";
+					continue;
+				}
+				for (const auto& entry : results) {
+					std::cout << entry.second.getName() << "\n";
+				}
+				break;
+			}
 			break;
 			}
 		case 3:{
@@ -224,9 +250,9 @@ void Menu::displayAdditonalMenu() {
 }
 
 int main() {
-	airportRepository repo;//new
+	airportRepository repo;
 	repo.loadFromCSV();
-	Menu::displayMainMenu(repo);//new in brackets
+	Menu::displayMainMenu(repo);
 	return 0;
 
 }
