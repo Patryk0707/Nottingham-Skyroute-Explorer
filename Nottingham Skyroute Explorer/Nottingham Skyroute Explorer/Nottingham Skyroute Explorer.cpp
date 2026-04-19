@@ -75,6 +75,7 @@ class airportRepository {
 		void loadFromCSV();
 		std::multimap<std::string,airport> searchAirportByCountry(const std::string& country) const;
 		std::multimap<std::string, airport> searchAirportByName(const std::string& name) const;
+		std::multimap<std::string, airport> searchAirportByIataCode(const std::string& iataCode) const;
 	private:
 		std::vector<airport>airports;
 };
@@ -98,7 +99,16 @@ std::multimap<std::string, airport> airportRepository::searchAirportByName(const
     }
     return result;
 }
+std::multimap<std::string, airport> airportRepository::searchAirportByIataCode(const std::string& iataCode) const {
+	std::multimap<std::string, airport> result;
 
+	for (const auto& a : airports) {
+		if (a.getIataCode() == iataCode) {
+			result.insert({ a.getIataCode(), a });
+		}
+	}
+	return result;
+}
 void airportRepository::loadFromCSV(){
 	std::ifstream airportsFile("../airports.csv"); //opens the CSV file and uses ../ to check for the file a folder before the x64 folder
 	std::string line;
@@ -216,8 +226,24 @@ void Menu::displayMainMenu(airportRepository& repo) {
 			break;
 			}
 		case 3:{
-			break;
+			std::string iataInput;
+			std::cout << "Enter a IATA code to find any matches: ";
+			while (true) {
+				std::cin >> iataInput;
+				if (iataInput == "exit")
+					break;
+				auto results = repo.searchAirportByIataCode(iataInput);
+				if (results.empty()) {
+					std::cout << "No airports matching that IATA Code. Try again or type 'exit' to return to the main menu.";
+					continue;
+				}
+				for (const auto& entry : results) {
+					std::cout << entry.second.getName() << "\n";
+				}
+				break;
 			}
+			break;
+		}
 		case 4:{
 			break;
 			}
