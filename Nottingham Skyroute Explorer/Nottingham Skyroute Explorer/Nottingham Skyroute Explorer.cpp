@@ -76,6 +76,7 @@ class airportRepository {
 		std::multimap<std::string,airport> searchAirportByCountry(const std::string& country) const;
 		std::multimap<std::string, airport> searchAirportByName(const std::string& name) const;
 		std::multimap<std::string, airport> searchAirportByIataCode(const std::string& iataCode) const;
+		std::map<std::string, int> countAirportsByType() const;
 	private:
 		std::vector<airport>airports;
 };
@@ -109,11 +110,19 @@ std::multimap<std::string, airport> airportRepository::searchAirportByIataCode(c
 	}
 	return result;
 }
+std::map<std::string, int> airportRepository::countAirportsByType() const {
+	std::map<std::string, int> count;
+
+	for (const auto& a : airports) {
+		count[a.getType()]++;
+	}
+	return count;
+}
 void airportRepository::loadFromCSV(){
 	std::ifstream airportsFile("../airports.csv"); //opens the CSV file and uses ../ to check for the file a folder before the x64 folder
 	std::string line;
 	if (airportsFile.is_open()) {
-		std::cout << "File read successfully";
+		std::cout << "Loading...";
 	}
 	else {
 		std::cout << "Error opening the file";
@@ -163,6 +172,7 @@ public:
 void Menu::displayMainMenu(airportRepository& repo) {
 	int userChoice;
 	while (true) {
+		std::cout << "File read successfully!" << std::endl;
 		std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
 		std::cout << "1. Search airports by country" << std::endl;
 		std::cout << "2. Search airports by name" << std::endl;
@@ -245,8 +255,16 @@ void Menu::displayMainMenu(airportRepository& repo) {
 			break;
 		}
 		case 4:{
-			break;
+			auto count = repo.countAirportsByType();
+
+			std::cout << "Airport count by type:\n";
+
+			for (const auto& entry : count) {
+				std::cout << entry.first << ": " << entry.second << "\n";
 			}
+
+			break;
+		}
 		case 5:{
 			break;
 			}
