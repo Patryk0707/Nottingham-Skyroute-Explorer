@@ -77,6 +77,7 @@ class airportRepository {
 		std::multimap<std::string, airport> searchAirportByName(const std::string& name) const;
 		std::multimap<std::string, airport> searchAirportByIataCode(const std::string& iataCode) const;
 		std::map<std::string, int> countAirportsByType() const;
+		void addAirport(const airport& a);
 	private:
 		std::vector<airport>airports;
 };
@@ -118,11 +119,14 @@ std::map<std::string, int> airportRepository::countAirportsByType() const {
 	}
 	return count;
 }
+void airportRepository::addAirport(const airport& a) {
+	airports.push_back(a);
+}
 void airportRepository::loadFromCSV(){
 	std::ifstream airportsFile("../airports.csv"); //opens the CSV file and uses ../ to check for the file a folder before the x64 folder
 	std::string line;
 	if (airportsFile.is_open()) {
-		std::cout << "Loading...";
+		std::cout << "Loading..." << std::endl;
 	}
 	else {
 		std::cout << "Error opening the file";
@@ -265,9 +269,86 @@ void Menu::displayMainMenu(airportRepository& repo) {
 
 			break;
 		}
-		case 5:{
-			break;
+		case 5: {
+			airport a;
+			std::string identifier,type,name,continent,isoCountry,isoRegion,municipality,icaoCode,iataCode,gpsCode,localCode,coordinates;
+			int elevation;
+			std::cout << "Enter identifier: ";
+			std::getline(std::cin,identifier);
+			while (identifier.empty()) {
+				std::cout << "Identifier cannot be empty:  ";
+				std::getline(std::cin,identifier);
 			}
+			std::cout << "Enter type: ";
+			std::getline(std::cin, type);
+			while (type.empty()) {
+				std::cout << "Type cannot be empty:  ";
+				std::getline(std::cin, type);
+			}
+			std::cout << "Enter name: ";
+			std::getline(std::cin, name);
+			while (name.empty()) {
+				std::cout << "Name cannot be empty:  ";
+				std::getline(std::cin, name);
+			}
+			std::string elevationStr;
+			std::cout << "Enter elevation in feet: ";
+			std::getline(std::cin, elevationStr);
+			while (elevationStr.empty() or elevationStr.find_first_not_of("0123456789") != std::string::npos){
+				std::cout << "Elevation cannot be empty and has to be a integer:  ";
+				std::getline(std::cin, elevationStr);
+			}
+			elevation = std::stoi(elevationStr);
+			std::cout << "Enter continent: ";
+			std::getline(std::cin, continent);
+			while (continent.empty()) {
+				std::cout << "Continent cannot be empty:  ";
+				std::getline(std::cin, continent);
+			}
+			std::cout << "Enter ISO country code: ";
+			std::getline(std::cin, isoCountry);
+			while (isoCountry.empty()) {
+				std::cout << "ISO Country cannot be empty:  ";
+				std::getline(std::cin, isoCountry);
+			}
+			std::cout << "Enter ISO region: ";
+			std::getline(std::cin, isoRegion);
+			while (isoRegion.empty()) {
+				std::cout << "ISO Region cannot be empty:  ";
+				std::getline(std::cin, isoRegion);
+			}
+			std::cout << "Enter municipality: ";
+			std::getline(std::cin, municipality);
+			while (municipality.empty()) {
+				std::cout << "Municipality cannot be empty:  ";
+				std::getline(std::cin, municipality);
+			}
+			std::cout << "Enter ICAO code(Can be empty): ";
+			std::getline(std::cin, icaoCode);
+			std::cout << "Enter IATA code(Can be empty): ";
+			std::getline(std::cin, iataCode);
+			std::cout << "Enter GPS code(Can be empty): ";
+			std::getline(std::cin, gpsCode);
+			std::cout << "Enter local code(Can be empty): ";
+			std::getline(std::cin, localCode);
+			std::cout << "Enter coordinates(format=x,y): ";
+			std::getline(std::cin, coordinates);
+			int commaCount = std::count(coordinates.begin(), coordinates.end(), ',');
+			while (coordinates.empty() or coordinates.find_first_not_of("0123456789,") != std::string::npos or commaCount!=1) {
+				std::cout << "Coordinates cannot be empty,must be integers and in the correct format:  ";
+				std::getline(std::cin, coordinates);
+				commaCount = std::count(coordinates.begin(), coordinates.end(), ',');
+			}
+
+			a.set(identifier, type, name, elevation, continent, isoCountry, isoRegion,
+				municipality, icaoCode, iataCode, gpsCode, localCode, coordinates);
+
+			repo.addAirport(a);
+
+			std::cout << "Airport added successfully.\n";
+			break;
+		}
+
 		case 6:{
 			break;
 			}
