@@ -4,6 +4,7 @@
 #include <map>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 class airport {					//new start
 	private:
 		std::string identifier;
@@ -78,6 +79,7 @@ class airportRepository {
 		std::multimap<std::string, airport> searchAirportByIataCode(const std::string& iataCode) const;
 		std::map<std::string, int> countAirportsByType() const;
 		void addAirport(const airport& a);
+		void saveToCsv() const;
 	private:
 		std::vector<airport>airports;
 };
@@ -165,8 +167,32 @@ void airportRepository::loadFromCSV(){
 		catch (...) {
 		}
 	}
+	std::cout << "File read successfully!" << std::endl;
 };
-//new end
+void airportRepository::saveToCsv() const {
+	std::ofstream file("../airports.csv");
+	if (!file.is_open()) {
+		std::cout << "Error:Could not open airports.csv for writing.\n";
+		return;
+	}
+	file << "ident,type,name,elevation_ft,continent,iso_country,iso_region,municipality,icao_code,iata_code,gps_code,local_code,coordinates\n";
+
+	for (const auto& a : airports) {
+		file << a.getIdentifier() << ","
+			<< a.getType() << ","
+			<< a.getName() << ","
+			<< a.getElevationInFeet() << ","
+			<< a.getContinent() << ","
+			<< a.getIsoCountry() << ","
+			<< a.getIsoRegion() << ","
+			<< a.getMunicipality() << ","
+			<< a.getIcaoCode() << ","
+			<< a.getIataCode() << ","
+			<< a.getGpsCode() << ","
+			<< a.getLocalCode() << ","
+			<< a.getCoordinates() << "\n";
+	}
+}
 class Menu {
 public:
 	static void displayMainMenu(airportRepository& repo);
@@ -176,7 +202,6 @@ public:
 void Menu::displayMainMenu(airportRepository& repo) {
 	int userChoice;
 	while (true) {
-		std::cout << "File read successfully!" << std::endl;
 		std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
 		std::cout << "1. Search airports by country" << std::endl;
 		std::cout << "2. Search airports by name" << std::endl;
@@ -350,6 +375,8 @@ void Menu::displayMainMenu(airportRepository& repo) {
 		}
 
 		case 6:{
+			repo.saveToCsv();
+			std::cout << "Changes saved.\n";
 			break;
 			}
 		case 7:{
