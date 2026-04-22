@@ -5,7 +5,8 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
-class airport {					//new start
+#include <cmath> // required for Haversine formula to calculate distance between two coordinates
+class airport {	
 	private:
 		std::string identifier;
 		std::string type;
@@ -19,7 +20,8 @@ class airport {					//new start
 		std::string iataCode;
 		std::string gpsCode;
 		std::string localCode;
-		std::string coordinates;
+		double latitude;
+		double longitude;
 
 	public:
 		std::string getIdentifier() const;
@@ -34,13 +36,14 @@ class airport {					//new start
 		std::string getIataCode() const;
 		std::string getGpsCode() const;
 		std::string getLocalCode() const;
-		std::string getCoordinates() const;
+		double getLatitude() const; 
+		double getLongitude() const; 
 		void set(std::string id, std::string typ, std::string nme, int elev, std::string cont, std::string isoC, std::string isoR,
-			std::string muni, std::string icao, std::string iata, std::string gps, std::string local, std::string coord);
+			std::string muni, std::string icao, std::string iata, std::string gps, std::string local,double lat,double lon);
 		
 };
 void airport::set(std::string id,std::string typ,std::string nme,int elev,std::string cont,std::string isoC,std::string isoR,
-	std::string muni,std::string icao,std::string iata,std::string gps,std::string local,std::string coord)
+	std::string muni,std::string icao,std::string iata,std::string gps,std::string local,double lat,double lon)
 {
 	identifier = id;
 	type = typ;
@@ -54,9 +57,12 @@ void airport::set(std::string id,std::string typ,std::string nme,int elev,std::s
 	iataCode = iata;
 	gpsCode = gps;
 	localCode = local;
-	coordinates = coord;
+	latitude = lat;
+	longitude = lon;
 
 };
+
+
 std::string airport::getName() const { return name; }
 std::string airport::getType() const { return type; }
 std::string airport::getIdentifier() const { return identifier; }
@@ -69,7 +75,9 @@ std::string airport::getIcaoCode() const { return icaoCode; }
 std::string airport::getIataCode() const { return iataCode; }
 std::string airport::getGpsCode() const { return gpsCode; }
 std::string airport::getLocalCode() const { return localCode; }
-std::string airport::getCoordinates() const { return coordinates; }
+double airport::getLatitude() const { return latitude; }
+double airport::getLongitude() const {return longitude;}
+
 
 class airportRepository {
 	public:
@@ -80,6 +88,8 @@ class airportRepository {
 		std::map<std::string, int> countAirportsByType() const;
 		void addAirport(const airport& a);
 		void saveToCsv() const;
+		airport* findByIdentifier(const std::string& ident);
+		double calculateAirportDistance(double lat1, double lon1, double lat2, double lon2);
 	private:
 		std::vector<airport>airports;
 };
@@ -139,10 +149,10 @@ void airportRepository::loadFromCSV(){
 
 	while (getline(airportsFile, line)) {
 		std::stringstream ss(line);
-		std::string temp;
+		std::string temp, latStr, lonStr;
 		airport a;
 		int elevationInFeet;
-		std::string identifier,type,name,continent,isoCountry, isoRegion, municipality, icaoCode, iataCode, gpsCode, localCode, coordinates;
+		std::string identifier,type,name,continent,isoCountry, isoRegion, municipality, icaoCode, iataCode, gpsCode, localCode;
 
 		try {
 			std::getline(ss, identifier, ',');
@@ -157,9 +167,11 @@ void airportRepository::loadFromCSV(){
 			std::getline(ss, iataCode, ',');
 			std::getline(ss, gpsCode, ',');
 			std::getline(ss, localCode, ',');
-			std::getline(ss, coordinates, ',');;
-
-			a.set(identifier, type, name, elevationInFeet, continent,isoCountry, isoRegion, municipality, icaoCode,iataCode, gpsCode, localCode, coordinates);
+			std::getline(ss, latStr, ','); 
+			std::getline(ss, lonStr, ',');
+			double lat = std::stod(latStr);
+			double lon = std::stod(lonStr);
+			a.set(identifier,type,name,elevationInFeet,continent,isoCountry,isoRegion,municipality,icaoCode,iataCode,gpsCode,localCode,lat,lon);
 
 			airports.push_back(a);
 
@@ -190,13 +202,41 @@ void airportRepository::saveToCsv() const {
 			<< a.getIataCode() << ","
 			<< a.getGpsCode() << ","
 			<< a.getLocalCode() << ","
-			<< a.getCoordinates() << "\n";
+			<< a.getLatitude() << ","  
+			<< a.getLongitude() << "\n"; 
 	}
+}
+double airportRepository::calculateAirportDistance(double lat1, double lon1, double lat2, double lon2) {
+	double earthRadiusKm = 6371.0;
+	double M_PI = 3.14159265358979323846;
+
+	double lat1InRadians = lat1 * M_PI / 180.0;
+	double lat2InRadians = lat2 * M_PI / 180.0;
+	double differenceInLatitude = (lat2 - lat1) * M_PI / 180.0;
+	double differenceInLongitude = (lon2 - lon1) * M_PI / 180.0;
+
+	// Haversine formula
+	double a = std::sin(differenceInLatitude / 2) * std::sin(differenceInLatitude / 2) +
+		std::cos(lat1InRadians) * std::cos(lat2InRadians) * std::sin(differenceInLongitude / 2) * std::sin(differenceInLongitude / 2); //distance between two airports in a straight line
+
+	double c = 2 * std::asin(std::sqrt(a)); //calculate the curve
+
+	return earthRadiusKm * c;
+
+
+}
+airport* airportRepository::findByIdentifier(const std::string& ident) {
+	for (auto& a : airports) {
+		if (a.getIdentifier() == ident) {
+			return &a; // Return memory address of the airport
+		}
+	}
+	return nullptr; // Returns null pointer if not found
 }
 class Menu {
 public:
 	static void displayMainMenu(airportRepository& repo);
-	static void displayAdditonalMenu();
+	static void displayAdditonalMenu(airportRepository& repo);
 };
 
 void Menu::displayMainMenu(airportRepository& repo) {
@@ -296,7 +336,7 @@ void Menu::displayMainMenu(airportRepository& repo) {
 		}
 		case 5: {
 			airport a;
-			std::string identifier,type,name,continent,isoCountry,isoRegion,municipality,icaoCode,iataCode,gpsCode,localCode,coordinates;
+			std::string identifier,type,name,continent,isoCountry,isoRegion,municipality,icaoCode,iataCode,gpsCode,localCode,latStr, lonStr;
 			int elevation;
 			std::cout << "Enter identifier: ";
 			std::getline(std::cin,identifier);
@@ -356,21 +396,33 @@ void Menu::displayMainMenu(airportRepository& repo) {
 			std::getline(std::cin, gpsCode);
 			std::cout << "Enter local code(Can be empty): ";
 			std::getline(std::cin, localCode);
-			std::cout << "Enter coordinates(format=x,y): ";
-			std::getline(std::cin, coordinates);
-			int commaCount = std::count(coordinates.begin(), coordinates.end(), ',');
-			while (coordinates.empty() or coordinates.find_first_not_of("0123456789,") != std::string::npos or commaCount!=1) {
-				std::cout << "Coordinates cannot be empty,must be integers and in the correct format:  ";
-				std::getline(std::cin, coordinates);
-				commaCount = std::count(coordinates.begin(), coordinates.end(), ',');
+			std::cout << "Enter latitude: ";
+			std::getline(std::cin, latStr);
+			while (latStr.empty() or latStr.find_first_not_of("0123456789,") != std::string::npos) {
+				std::cout << "latitude cannot be empty and must be integers:  ";
+				std::getline(std::cin, latStr);
+			}
+			std::cout << "Enter longitude: ";
+			std::getline(std::cin, lonStr);
+			while (lonStr.empty() or lonStr.find_first_not_of("0123456789,") != std::string::npos) {
+				std::cout << "longitude cannot be empty and must be integers:  ";
+				std::getline(std::cin, lonStr);
 			}
 
-			a.set(identifier, type, name, elevation, continent, isoCountry, isoRegion,
-				municipality, icaoCode, iataCode, gpsCode, localCode, coordinates);
+			try {
+				double latitude = std::stod(latStr);
+				double longitude = std::stod(lonStr);
 
-			repo.addAirport(a);
+				a.set(identifier, type, name, elevation, continent, isoCountry, isoRegion,
+					municipality, icaoCode, iataCode, gpsCode, localCode, latitude, longitude);
 
-			std::cout << "Airport added successfully.\n";
+				repo.addAirport(a);
+
+				std::cout << "Airport added successfully.\n";
+			}
+			catch (...) {
+				std::cout << "Error: Could not convert latitude or longitude to a number. Airport has not been added.\n";
+			}
 			break;
 		}
 
@@ -380,7 +432,7 @@ void Menu::displayMainMenu(airportRepository& repo) {
 			break;
 			}
 		case 7:{
-			Menu::displayAdditonalMenu();
+			Menu::displayAdditonalMenu(repo);
 			break;
 			}
 		case 8:{
@@ -392,15 +444,65 @@ void Menu::displayMainMenu(airportRepository& repo) {
 	}
 }
 
-void Menu::displayAdditonalMenu() {
+void Menu::displayAdditonalMenu(airportRepository& repo) {
 	int userChoice;
-	std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
-	std::cout << "1. radius search" << std::endl;
-	std::cout << "2. nearest airport" << std::endl;
-	std::cout << "3. sort airports" << std::endl;
-	std::cin >> userChoice;
-}
+	while (true) {
+		std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
+		std::cout << "1. Calculate distance between airports" << std::endl;
+		std::cout << "2. Find nearest airport to a given location" << std::endl;
+		std::cout << "3. List all airports within a radius" << std::endl;
+		std::cout << "4. List highest or lowest elevation airports" << std::endl;
+		std::cout << "5. List airports with missing IATA codes" << std::endl;
+		std::cout << "6. Group airports by municipality" << std::endl;
+		std::cout << "7. Sort airports" << std::endl;
+		std::cout << "8. Exit" << std::endl;
+		std::cin >> userChoice;
+		while (std::cin.fail()) {
+			std::cin.clear();
+			std::cin.ignore(1000, '\n');
+			std::cout << "Invalid input, Please input a number:";
+			std::cin >> userChoice;
+		}
+		while (userChoice > 8 or userChoice < 1) {
+			std::cin.ignore();
+			std::cout << "Please enter a number within 1-8";
+			std::cin >> userChoice;
+		}
 
+		switch (userChoice) {
+		case 1: {
+			std::string id1, id2;
+			std::cout << "Enter first airport identifier (e.g., EGLL): ";
+			std::cin >> id1;
+			std::cout << "Enter second airport identifier: ";
+			std::cin >> id2;
+
+			airport* a1 = repo.findByIdentifier(id1);
+			airport* a2 = repo.findByIdentifier(id2);
+
+			if (a1 && a2) {
+				double dist = repo.calculateAirportDistance(
+					a1->getLatitude(), a1->getLongitude(),
+					a2->getLatitude(), a2->getLongitude()
+				);
+				std::cout << "Distance between " << a1->getName()
+					<< " and " << a2->getName() << " is: "
+					<< dist << " km\n";
+			}
+			else {
+				std::cout << "Error: One or both identifiers were not found.\n";
+			}
+			break;
+		}
+		case 8:
+			return; 
+		default:
+			std::cout << "Invalid choice.\n";
+			break;
+		} 
+	} 
+} 
+	
 int main() {
 	airportRepository repo;
 	repo.loadFromCSV();
