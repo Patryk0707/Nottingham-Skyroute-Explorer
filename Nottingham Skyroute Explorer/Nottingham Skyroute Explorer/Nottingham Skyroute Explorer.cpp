@@ -40,7 +40,6 @@ class airport {
 		double getLongitude() const; 
 		void set(std::string id, std::string typ, std::string nme, int elev, std::string cont, std::string isoC, std::string isoR,
 			std::string muni, std::string icao, std::string iata, std::string gps, std::string local,double lat,double lon);
-		
 };
 void airport::set(std::string id,std::string typ,std::string nme,int elev,std::string cont,std::string isoC,std::string isoR,
 	std::string muni,std::string icao,std::string iata,std::string gps,std::string local,double lat,double lon)
@@ -90,6 +89,7 @@ class airportRepository {
 		void saveToCsv() const;
 		airport* findByIdentifier(const std::string& ident);
 		double calculateAirportDistance(double lat1, double lon1, double lat2, double lon2);
+		airport* findNearestAirport(const std::string& ident);
 	private:
 		std::vector<airport>airports;
 };
@@ -233,6 +233,29 @@ airport* airportRepository::findByIdentifier(const std::string& ident) {
 	}
 	return nullptr; // Returns null pointer if not found
 }
+airport* airportRepository::findNearestAirport(const std::string& ident) {
+	airport* airportInput = findByIdentifier(ident);
+	if (!airportInput) return nullptr;
+
+	airport* nearestAirport = nullptr;
+	double minDistance = -1.0;
+
+	for (auto& otherAirport : airports) {
+		// Don't calculate distance to itself
+		if (otherAirport.getIdentifier() == ident) continue;
+
+		double dist = calculateAirportDistance(
+			airportInput->getLatitude(), airportInput->getLongitude(),
+			otherAirport.getLatitude(), otherAirport.getLongitude()
+		);
+
+		if (minDistance < 0 or dist < minDistance) {
+			minDistance = dist;
+			nearestAirport = &otherAirport;
+		}
+	}
+	return nearestAirport;
+}
 class Menu {
 public:
 	static void displayMainMenu(airportRepository& repo);
@@ -249,7 +272,7 @@ void Menu::displayMainMenu(airportRepository& repo) {
 		std::cout << "4. Count airports by type" << std::endl;
 		std::cout << "5. Add a new airport" << std::endl;
 		std::cout << "6. Save changes" << std::endl;
-		std::cout << "7. Advanced options(radius search, nearest airport, high / low elevation,sort etc.)" << std::endl;
+		std::cout << "7. Advanced options" << std::endl;
 		std::cout << "8. Exit" << std::endl;
 		std::cout << "Enter a number:";
 		std::cin >> userChoice;
@@ -447,7 +470,7 @@ void Menu::displayMainMenu(airportRepository& repo) {
 void Menu::displayAdditonalMenu(airportRepository& repo) {
 	int userChoice;
 	while (true) {
-		std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
+		std::cout << "====== Advanced Features ======" << std::endl;
 		std::cout << "1. Calculate distance between airports" << std::endl;
 		std::cout << "2. Find nearest airport to a given location" << std::endl;
 		std::cout << "3. List all airports within a radius" << std::endl;
@@ -491,6 +514,28 @@ void Menu::displayAdditonalMenu(airportRepository& repo) {
 			}
 			else {
 				std::cout << "Error: One or both identifiers were not found.\n";
+			}
+			break;
+		}
+		case 2: {
+			std::string airportId;
+			std::cout << "Enter a airport identifier to search the nearest airport from: ";
+			std::cin >> airportId;
+
+			airport* nearestAirport = repo.findNearestAirport(airportId);
+			airport* airportChosen = repo.findByIdentifier(airportId);
+
+			if (nearestAirport && airportChosen) {
+				double distance = repo.calculateAirportDistance(
+					airportChosen->getLatitude(), airportChosen->getLongitude(),
+					nearestAirport->getLatitude(), nearestAirport->getLongitude()
+				);
+				std::cout << "The nearest airport to " << airportChosen->getName() << " (" << airportId << ") is:\n";
+				std::cout << "Name: " << nearestAirport->getName() << " (" << nearestAirport->getIdentifier() << ")\n";
+				std::cout << "Distance: " << distance << " km\n";
+			}
+			else {
+				std::cout << "Error: Identifier not found\n";
 			}
 			break;
 		}
