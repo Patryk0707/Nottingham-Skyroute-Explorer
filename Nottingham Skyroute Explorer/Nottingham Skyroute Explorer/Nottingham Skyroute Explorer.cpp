@@ -90,6 +90,7 @@ class airportRepository {
 		airport* findByIdentifier(const std::string& ident);
 		double calculateAirportDistance(double lat1, double lon1, double lat2, double lon2);
 		airport* findNearestAirport(const std::string& ident);
+		std::vector<airport> findAirportsInRadius(const std::string& ident, double radiusKm);
 	private:
 		std::vector<airport>airports;
 };
@@ -255,6 +256,27 @@ airport* airportRepository::findNearestAirport(const std::string& ident) {
 		}
 	}
 	return nearestAirport;
+}
+std::vector<airport> airportRepository::findAirportsInRadius(const std::string& ident, double radiusKm) {
+	std::vector<airport> result;
+	airport* centerAirport = findByIdentifier(ident);
+
+	if (!centerAirport) return result; // returns empty if airport found by user not found
+
+	for (const auto& nearestAirportInRadius : airports) {
+		// Skip the airport that the user has chosen
+		if (nearestAirportInRadius.getIdentifier() == ident) continue;
+
+		double dist = calculateAirportDistance(
+			centerAirport->getLatitude(), centerAirport->getLongitude(),
+			nearestAirportInRadius.getLatitude(), nearestAirportInRadius.getLongitude()
+		);
+
+		if (dist <= radiusKm) {
+			result.push_back(nearestAirportInRadius);
+		}
+	}
+	return result;
 }
 class Menu {
 public:
@@ -536,6 +558,49 @@ void Menu::displayAdditonalMenu(airportRepository& repo) {
 			}
 			else {
 				std::cout << "Error: Identifier not found\n";
+			}
+			break;
+		}
+		case 3: {
+			std::string ident;
+			double radius;
+
+			std::cout << "Enter the reference airport identifier: ";
+			std::cin >> ident;
+			std::cout << "Enter the radius in kilometers: ";
+			std::cin >> radius;
+
+			// validates radius input
+			if (std::cin.fail() || radius < 0) {
+				std::cin.clear();
+				std::cin.ignore(1000, '\n');
+				std::cout << "Invalid radius entered.\n";
+				break;
+			}
+
+			std::vector<airport> nearbyAirports = repo.findAirportsInRadius(ident, radius);
+
+			if (nearbyAirports.empty()) {
+				// This happens because either the identifier is wrong or theres no airports within the radius
+				if (repo.findByIdentifier(ident) == nullptr) {
+					std::cout << "Error: Reference airport identifier '" << ident << "' not found.\n";
+				}
+				else {
+					std::cout << "No other airports found within " << radius << " km.\n";
+				}
+			}
+			else {
+				std::cout << "\nFound " << nearbyAirports.size() << " airports within " << radius << " km:\n";
+				std::cout << "--------------------------------------------------\n";
+				for (const auto& a : nearbyAirports) {
+					airport* chosenAirport = repo.findByIdentifier(ident);
+					double d = repo.calculateAirportDistance(chosenAirport->getLatitude(), chosenAirport->getLongitude(),
+						a.getLatitude(), a.getLongitude());
+
+					std::cout << "[" << a.getIdentifier() << "] " << a.getName()
+						<< " | Distance: " << d << " km\n";
+				}
+				std::cout << "--------------------------------------------------\n";
 			}
 			break;
 		}
