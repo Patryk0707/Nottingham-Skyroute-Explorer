@@ -91,6 +91,8 @@ class airportRepository {
 		double calculateAirportDistance(double lat1, double lon1, double lat2, double lon2);
 		airport* findNearestAirport(const std::string& ident);
 		std::vector<airport> findAirportsInRadius(const std::string& ident, double radiusKm);
+		std::vector<airport> getTop10LowestElevation() const;
+		std::vector<airport> getTop10HighestElevation() const;
 	private:
 		std::vector<airport>airports;
 };
@@ -277,6 +279,31 @@ std::vector<airport> airportRepository::findAirportsInRadius(const std::string& 
 		}
 	}
 	return result;
+}
+std::vector<airport> airportRepository::getTop10LowestElevation() const {
+	std::vector<airport> lowestElevationVector = airports;
+
+	//Sort in ascending order (lowest elevation first)
+	std::sort(lowestElevationVector.begin(), lowestElevationVector.end(), [](const airport& a, const airport& b) {
+		return a.getElevationInFeet() < b.getElevationInFeet();
+		});
+
+	//Only keep the top 10
+	if (lowestElevationVector.size() > 10) lowestElevationVector.resize(10);
+	return lowestElevationVector;
+}
+
+std::vector<airport> airportRepository::getTop10HighestElevation() const {
+	std::vector<airport> highestElevationVector = airports;
+
+	//Sort it in descending order (Highest elevation first)
+	std::sort(highestElevationVector.begin(), highestElevationVector.end(), [](const airport& a, const airport& b) {
+		return a.getElevationInFeet() > b.getElevationInFeet();
+		});
+
+	//Only keep the top 10
+	if (highestElevationVector.size() > 10) highestElevationVector.resize(10);
+	return highestElevationVector;
 }
 class Menu {
 public:
@@ -602,6 +629,36 @@ void Menu::displayAdditonalMenu(airportRepository& repo) {
 				}
 				std::cout << "--------------------------------------------------\n";
 			}
+			break;
+		}
+		case 4: {
+			int elevationChoice;
+			std::cout << "\nWhich elevation of airports would you like to see?" << std::endl;
+			std::cout << "1. Show 10 Highest Airports" << std::endl;
+			std::cout << "2. Show 10 Lowest Airports" << std::endl;
+			std::cout << "Enter choice: ";
+			std::cin >> elevationChoice;
+
+			std::vector<airport> results;
+			if (elevationChoice == 1) {
+				results = repo.getTop10HighestElevation();
+				std::cout << "\nTop 10 Highest Elevation Airports:\n";
+			}
+			else if (elevationChoice == 2) {
+				results = repo.getTop10LowestElevation();
+				std::cout << "\nTop 10 Lowest Elevation Airports:\n";
+			}
+			else {
+				std::cout << "Invalid choice.\n";
+				break;
+			}
+
+			std::cout << "--------------------------------------------------\n";
+			for (const auto& a : results) {
+				std::cout << a.getElevationInFeet() << " ft | "
+					 << a.getName() << " (" << a.getIsoCountry() << ")\n";
+			}
+			std::cout << "--------------------------------------------------\n";
 			break;
 		}
 		case 8:
