@@ -93,6 +93,7 @@ class airportRepository {
 		std::vector<airport> findAirportsInRadius(const std::string& ident, double radiusKm);
 		std::vector<airport> getTop10LowestElevation() const;
 		std::vector<airport> getTop10HighestElevation() const;
+		std::vector<airport> getAirportsWithMissingIata() const;
 	private:
 		std::vector<airport>airports;
 };
@@ -304,6 +305,15 @@ std::vector<airport> airportRepository::getTop10HighestElevation() const {
 	//Only keep the top 10
 	if (highestElevationVector.size() > 10) highestElevationVector.resize(10);
 	return highestElevationVector;
+}
+std::vector<airport> airportRepository::getAirportsWithMissingIata() const {
+	std::vector<airport> result;
+	for (const auto& a : airports) {
+		if (a.getIataCode().empty()) {
+			result.push_back(a);
+		}
+	}
+	return result;
 }
 class Menu {
 public:
@@ -659,6 +669,28 @@ void Menu::displayAdditonalMenu(airportRepository& repo) {
 					 << a.getName() << " (" << a.getIsoCountry() << ")\n";
 			}
 			std::cout << "--------------------------------------------------\n";
+			break;
+		}
+		case 5: {
+			std::vector<airport> missingIata = repo.getAirportsWithMissingIata();
+
+			if (missingIata.empty()) {
+				std::cout << "No airports have missing IATA codes.\n";
+			}
+			else {
+				std::cout << "--------------------------------------------------------------------------------\n";
+
+				// Loop through the vector and print every airport without a IATA Code
+				for (const auto& a : missingIata) {
+					std::cout << "[" << a.getIdentifier() << "] "
+						<< a.getName() << " | "
+						<< "Country: " << a.getIsoCountry() << " | "
+						<< "Municipality: " << a.getMunicipality() << "\n";
+				}
+
+				std::cout << "--------------------------------------------------------------------------------\n";
+				std::cout << "\nFound " << missingIata.size() << " airports with missing IATA codes\n";
+			}
 			break;
 		}
 		case 8:
