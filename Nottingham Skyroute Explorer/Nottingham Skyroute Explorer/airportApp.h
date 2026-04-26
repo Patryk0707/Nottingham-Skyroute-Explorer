@@ -9,7 +9,7 @@ public:
     void displayMainMenu();
 
 private:
-    void runAdvancedMenu(airportRepository& repo);
+    void displayAdditonalMenu(airportRepository& repo);
 };
 
 #endif

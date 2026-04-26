@@ -38,3 +38,4 @@ public:
 	void set(std::string id, std::string typ, std::string nme, int elev, std::string cont, std::string isoC, std::string isoR,
 		std::string muni, std::string icao, std::string iata, std::string gps, std::string local, double lat, double lon);
 };
+#endif

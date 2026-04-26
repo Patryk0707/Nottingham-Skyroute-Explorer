@@ -15,8 +15,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Nottingham Skyroute Explorer.cpp">
+    <ClCompile Include="AirportApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AirportRepository.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="airport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="airportApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="airportRepository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

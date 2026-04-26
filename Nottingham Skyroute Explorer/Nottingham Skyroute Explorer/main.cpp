@@ -1,7 +1,7 @@
-#include "BookApp.h"
+#include "airportApp.h"
 
 int main() {
     AirportApp app;
-    app.run();
+    app.displayMainMenu();
     return 0;
 }

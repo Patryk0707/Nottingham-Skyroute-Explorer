@@ -3,7 +3,9 @@
 #include <string>
 
 
-void AirportApp::displayMainMenu(airportRepository& repo) {
+void AirportApp::displayMainMenu() {
+	airportRepository repo;
+	repo.loadFromCSV();
 	int userChoice;
 	while (true) {
 		std::cout << "====== Nottingham SkyRoute Explorer ======" << std::endl;
@@ -196,7 +198,7 @@ void AirportApp::displayMainMenu(airportRepository& repo) {
 			break;
 		}
 		case 7: {
-			Menu::displayAdditonalMenu(repo);
+			displayAdditonalMenu(repo);
 			break;
 		}
 		case 8: {

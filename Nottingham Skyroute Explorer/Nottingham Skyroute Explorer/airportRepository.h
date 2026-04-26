@@ -25,3 +25,5 @@ public:
 	std::vector<airport> getSortedAirports(int criteria, int orderChoice) const;
 private:
 	std::vector<airport>airports;
+};
+#endif

@@ -4,6 +4,26 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+void airport::set(std::string id, std::string typ, std::string nme, int elev, std::string cont, std::string isoC, std::string isoR,
+	std::string muni, std::string icao, std::string iata, std::string gps, std::string local, double lat, double lon) {
+	identifier = id; type = typ; name = nme; elevationInFeet = elev; continent = cont;
+	isoCountry = isoC; isoRegion = isoR; municipality = muni; icaoCode = icao;
+	iataCode = iata; gpsCode = gps; localCode = local; latitude = lat; longitude = lon;
+}
+std::string airport::getName() const { return name; }
+std::string airport::getType() const { return type; }
+std::string airport::getIdentifier() const { return identifier; }
+int airport::getElevationInFeet() const { return elevationInFeet; }
+std::string airport::getContinent() const { return continent; }
+std::string airport::getIsoCountry() const { return isoCountry; }
+std::string airport::getIsoRegion() const { return isoRegion; }
+std::string airport::getMunicipality() const { return municipality; }
+std::string airport::getIcaoCode() const { return icaoCode; }
+std::string airport::getIataCode() const { return iataCode; }
+std::string airport::getGpsCode() const { return gpsCode; }
+std::string airport::getLocalCode() const { return localCode; }
+double airport::getLatitude() const { return latitude; }
+double airport::getLongitude() const { return longitude; }
 
 std::multimap<std::string, airport> airportRepository::searchAirportByCountry(const std::string& country) const {
 	std::multimap<std::string, airport> result;
@@ -266,3 +286,4 @@ std::vector<airport> airportRepository::getSortedAirports(int criteria, int orde
 		});
 
 	return sortedData;
+}
