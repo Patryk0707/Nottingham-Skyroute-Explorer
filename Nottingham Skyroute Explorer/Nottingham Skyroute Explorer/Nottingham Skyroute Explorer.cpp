@@ -94,6 +94,7 @@ class airportRepository {
 		std::vector<airport> getTop10LowestElevation() const;
 		std::vector<airport> getTop10HighestElevation() const;
 		std::vector<airport> getAirportsWithMissingIata() const;
+		std::vector<airport> getAirportsByMunicipality(const std::string& municipalities) const;
 	private:
 		std::vector<airport>airports;
 };
@@ -310,6 +311,25 @@ std::vector<airport> airportRepository::getAirportsWithMissingIata() const {
 	std::vector<airport> result;
 	for (const auto& a : airports) {
 		if (a.getIataCode().empty()) {
+			result.push_back(a);
+		}
+	}
+	return result;
+}
+std::vector<airport> airportRepository::getAirportsByMunicipality(const std::string& municipalities) const {
+	std::vector<airport> result;
+
+	//Uppercase version of what the user typed
+	std::string municipalitiesInput = municipalities;
+	std::transform(municipalitiesInput.begin(), municipalitiesInput.end(), municipalitiesInput.begin(), ::toupper);
+
+	for (const auto& a : airports) {
+		//Uppercase version of the current airport's municipality
+		std::string municipalitiesUpperCase = a.getMunicipality();
+		std::transform(municipalitiesUpperCase.begin(), municipalitiesUpperCase.end(), municipalitiesUpperCase.begin(), ::toupper);
+
+		//Compare input to the current airport's municipality, if they match add the airport to the result vector
+		if (municipalitiesUpperCase == municipalitiesInput) {
 			result.push_back(a);
 		}
 	}
@@ -690,6 +710,27 @@ void Menu::displayAdditonalMenu(airportRepository& repo) {
 
 				std::cout << "--------------------------------------------------------------------------------\n";
 				std::cout << "\nFound " << missingIata.size() << " airports with missing IATA codes\n";
+			}
+			break;
+		}
+		case 6: {
+			std::string municipalitySearch;
+			std::cout << "\nEnter the Municipality name to search: ";
+			std::cin.ignore(1000, '\n');
+			std::getline(std::cin, municipalitySearch);
+
+			std::vector<airport> results = repo.getAirportsByMunicipality(municipalitySearch);
+
+			if (results.empty()) {
+				std::cout << "No airports found for municipality: '" << municipalitySearch << "'\n";
+			}
+			else {
+				std::cout << "\nFound " << results.size() << " airport in " << municipalitySearch << ":\n";
+				std::cout << "--------------------------------------------------\n";
+				for (const auto& a : results) {
+					std::cout << "- " << a.getName() << " (" << a.getIdentifier() << ")\n";
+				}
+				std::cout << "--------------------------------------------------\n";
 			}
 			break;
 		}
