@@ -95,6 +95,7 @@ class airportRepository {
 		std::vector<airport> getTop10HighestElevation() const;
 		std::vector<airport> getAirportsWithMissingIata() const;
 		std::vector<airport> getAirportsByMunicipality(const std::string& municipalities) const;
+		std::vector<airport> getSortedAirports(int criteria,int orderChoice) const;
 	private:
 		std::vector<airport>airports;
 };
@@ -334,6 +335,31 @@ std::vector<airport> airportRepository::getAirportsByMunicipality(const std::str
 		}
 	}
 	return result;
+}
+std::vector<airport> airportRepository::getSortedAirports(int criteria, int orderChoice) const {
+	std::vector<airport> sortedData = airports;
+
+	std::sort(sortedData.begin(), sortedData.end(), [criteria, orderChoice](const airport& a, const airport& b) {
+		//Ascending 
+		if (orderChoice == 1) {
+			if (criteria == 1) return a.getName() < b.getName();
+			if (criteria == 2) return a.getIsoCountry() < b.getIsoCountry();
+			if (criteria == 3) return a.getType() < b.getType();
+			if (criteria == 4) return a.getLatitude() < b.getLatitude();
+			if (criteria == 5) return a.getElevationInFeet() < b.getElevationInFeet();
+		}
+		//Descending
+		else {
+			if (criteria == 1) return a.getName() > b.getName();
+			if (criteria == 2) return a.getIsoCountry() > b.getIsoCountry();
+			if (criteria == 3) return a.getType() > b.getType();
+			if (criteria == 4) return a.getLatitude() > b.getLatitude();
+			if (criteria == 5) return a.getElevationInFeet() > b.getElevationInFeet();
+		}
+		return false;
+		});
+
+	return sortedData;
 }
 class Menu {
 public:
@@ -731,6 +757,28 @@ void Menu::displayAdditonalMenu(airportRepository& repo) {
 					std::cout << "- " << a.getName() << " (" << a.getIdentifier() << ")\n";
 				}
 				std::cout << "--------------------------------------------------\n";
+			}
+			break;
+		}
+		case 7: {
+			int sortChoice, orderChoice;
+
+			std::cout << "\nSort airports by:\n";
+			std::cout << "1. Name\n2. Country\n3. Type\n4. Latitude\n5. Elevation\n";
+			std::cout << "Enter choice(1-5): ";
+			std::cin >> sortChoice;
+
+			std::cout << "\nOrder:\n";
+			std::cout << "1. Ascending (A-Z)\n2. Descending (Z-A)\n";
+			std::cout << "Enter choice(1 or 2): ";
+			std::cin >> orderChoice;
+
+			std::vector<airport> sorted = repo.getSortedAirports(sortChoice, orderChoice);
+
+			std::cout << "\n--- Sorted Results ---\n";
+			for (const auto& a : sorted) {
+				std::cout << a.getName() << " (" << a.getIsoCountry() << ") - "
+					<< a.getElevationInFeet() << " ft\n";
 			}
 			break;
 		}
