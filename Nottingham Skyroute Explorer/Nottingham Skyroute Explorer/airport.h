@@ -4,7 +4,7 @@
 
 #include <string>
 class airport {
-private:
+private://Declares the private variables that will be used to store the information of the airports from the CSV file
 	std::string identifier;
 	std::string type;
 	std::string name;
@@ -20,7 +20,7 @@ private:
 	double latitude;
 	double longitude;
 
-public:
+public://Declares all the getter methods to get the information of the airports from the CSV file
 	std::string getIdentifier() const;
 	std::string getType() const;
 	std::string getName() const;

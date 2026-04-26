@@ -6,7 +6,7 @@
 #include <map>
 #include <string>
 class airportRepository {
-public:
+public://Declaration of all the functions that will be used in the airportRepository.cpp file including parameters and return types
 	void loadFromCSV();
 	std::multimap<std::string, airport> searchAirportByCountry(const std::string& country) const;
 	std::multimap<std::string, airport> searchAirportByName(const std::string& name) const;
@@ -23,7 +23,7 @@ public:
 	std::vector<airport> getAirportsWithMissingIata() const;
 	std::vector<airport> getAirportsByMunicipality(const std::string& municipalities) const;
 	std::vector<airport> getSortedAirports(int criteria, int orderChoice) const;
-private:
+private://Declaration of the vector that will be used to store all the airports
 	std::vector<airport>airports;
 };
 #endif

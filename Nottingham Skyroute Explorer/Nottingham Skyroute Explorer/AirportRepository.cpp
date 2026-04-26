@@ -8,9 +8,9 @@ void airport::set(std::string id, std::string typ, std::string nme, int elev, st
 	std::string muni, std::string icao, std::string iata, std::string gps, std::string local, double lat, double lon) {
 	identifier = id; type = typ; name = nme; elevationInFeet = elev; continent = cont;
 	isoCountry = isoC; isoRegion = isoR; municipality = muni; icaoCode = icao;
-	iataCode = iata; gpsCode = gps; localCode = local; latitude = lat; longitude = lon;
+	iataCode = iata; gpsCode = gps; localCode = local; latitude = lat; longitude = lon; //sets all the variables of the airport class to the values that are passed in as parameters
 }
-std::string airport::getName() const { return name; }
+std::string airport::getName() const { return name; }//getter methods to access the return the value of the variables of the airport class
 std::string airport::getType() const { return type; }
 std::string airport::getIdentifier() const { return identifier; }
 int airport::getElevationInFeet() const { return elevationInFeet; }
@@ -28,7 +28,7 @@ double airport::getLongitude() const { return longitude; }
 std::multimap<std::string, airport> airportRepository::searchAirportByCountry(const std::string& country) const {
 	std::multimap<std::string, airport> result;
 
-	for (const auto& a : airports) {
+	for (const auto& a : airports) {//iterates through all the airports in the vector and adds matching airports by country to the result multimap
 		if (a.getIsoCountry() == country) {
 			result.insert({ a.getIsoCountry(), a });
 		}
@@ -38,7 +38,7 @@ std::multimap<std::string, airport> airportRepository::searchAirportByCountry(co
 std::multimap<std::string, airport> airportRepository::searchAirportByName(const std::string& name) const {
 	std::multimap<std::string, airport> result;
 
-	for (const auto& a : airports) {
+	for (const auto& a : airports) {//iterates through all the airports in the vector and adds matching airports by name to the result multimap
 		if (a.getName().find(name) != std::string::npos) {
 			result.insert({ a.getName(), a });
 		}
@@ -48,7 +48,7 @@ std::multimap<std::string, airport> airportRepository::searchAirportByName(const
 std::multimap<std::string, airport> airportRepository::searchAirportByIataCode(const std::string& iataCode) const {
 	std::multimap<std::string, airport> result;
 
-	for (const auto& a : airports) {
+	for (const auto& a : airports) {//iterates through all the airports in the vector and adds matching airports by IATA code to the result multimap
 		if (a.getIataCode() == iataCode) {
 			result.insert({ a.getIataCode(), a });
 		}
@@ -58,12 +58,12 @@ std::multimap<std::string, airport> airportRepository::searchAirportByIataCode(c
 std::map<std::string, int> airportRepository::countAirportsByType() const {
 	std::map<std::string, int> count;
 
-	for (const auto& a : airports) {
+	for (const auto& a : airports) {//iterates through all the airports in the vector and counts the number of airports by type
 		count[a.getType()]++;
 	}
 	return count;
 }
-void airportRepository::addAirport(const airport& a) {
+void airportRepository::addAirport(const airport& a) {//adds the new airport the user has created to the vector of airports
 	airports.push_back(a);
 }
 void airportRepository::loadFromCSV() {
@@ -87,7 +87,7 @@ void airportRepository::loadFromCSV() {
 		std::string identifier, type, name, continent, isoCountry, isoRegion, municipality, icaoCode, iataCode, gpsCode, localCode;
 
 		try {
-			std::getline(ss, identifier, ',');
+			std::getline(ss, identifier, ',');//Reads the lines from the CSV file and stores the information to the variables used below
 			std::getline(ss, type, ',');
 			std::getline(ss, name, ',');
 			std::getline(ss, temp, ','); elevationInFeet = std::stoi(temp);
@@ -101,7 +101,7 @@ void airportRepository::loadFromCSV() {
 			std::getline(ss, localCode, ',');
 			std::getline(ss, latStr, ',');
 			std::getline(ss, lonStr, ',');
-			double lat = std::stod(latStr);
+			double lat = std::stod(latStr);//Converts the latitude and longitude from string to double using std::stod
 			double lon = std::stod(lonStr);
 			a.set(identifier, type, name, elevationInFeet, continent, isoCountry, isoRegion, municipality, icaoCode, iataCode, gpsCode, localCode, lat, lon);
 
@@ -111,10 +111,10 @@ void airportRepository::loadFromCSV() {
 		catch (...) {
 		}
 	}
-	std::cout << "File read successfully!" << std::endl;
+	std::cout << "File read successfully!" << std::endl;//if no errors occur while reading the file, this will be outputted to the user
 };
 void airportRepository::saveToCsv() const {
-	std::ofstream file("../airports.csv");
+	std::ofstream file("../airports.csv"); //opens the CSV file for writing
 	if (!file.is_open()) {
 		std::cout << "Error:Could not open airports.csv for writing.\n";
 		return;
@@ -135,7 +135,7 @@ void airportRepository::saveToCsv() const {
 			<< a.getGpsCode() << ","
 			<< a.getLocalCode() << ","
 			<< a.getLatitude() << ","
-			<< a.getLongitude() << "\n";
+			<< a.getLongitude() << "\n";//saves all the information of airports from the vector back to the CSV file
 	}
 }
 double airportRepository::calculateAirportDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -160,14 +160,14 @@ double airportRepository::calculateAirportDistance(double lat1, double lon1, dou
 airport* airportRepository::findByIdentifier(const std::string& ident) {
 	for (auto& a : airports) {
 		if (a.getIdentifier() == ident) {
-			return &a; // Return memory address of the airport
+			return &a; //Returns memory address of the airport that has been found by identifier
 		}
 	}
-	return nullptr; // Returns null pointer if not found
+	return nullptr; // Returns null pointer if there is no matches
 }
 airport* airportRepository::findNearestAirport(const std::string& ident) {
 	airport* airportInput = findByIdentifier(ident);
-	if (!airportInput) return nullptr;
+	if (!airportInput) return nullptr;//if there isnt an airport found that the user has inputted, return a null pointer
 
 	airport* nearestAirport = nullptr;
 	double minDistance = -1.0;
@@ -178,7 +178,7 @@ airport* airportRepository::findNearestAirport(const std::string& ident) {
 
 		double dist = calculateAirportDistance(
 			airportInput->getLatitude(), airportInput->getLongitude(),
-			otherAirport.getLatitude(), otherAirport.getLongitude()
+			otherAirport.getLatitude(), otherAirport.getLongitude()//calculate the distance between each airport to the airport that the user has entered and output the closest airport
 		);
 
 		if (minDistance < 0 or dist < minDistance) {
@@ -198,13 +198,13 @@ std::vector<airport> airportRepository::findAirportsInRadius(const std::string& 
 		// Skip the airport that the user has chosen
 		if (nearestAirportInRadius.getIdentifier() == ident) continue;
 
-		double dist = calculateAirportDistance(
+		double dist = calculateAirportDistance(//show the distance of airports within the radius to the airport that the user has entered
 			centerAirport->getLatitude(), centerAirport->getLongitude(),
 			nearestAirportInRadius.getLatitude(), nearestAirportInRadius.getLongitude()
 		);
 
 		if (dist <= radiusKm) {
-			result.push_back(nearestAirportInRadius);
+			result.push_back(nearestAirportInRadius);//if the distance is within the radius, add the airport to the result vector
 		}
 	}
 	return result;
@@ -237,7 +237,7 @@ std::vector<airport> airportRepository::getTop10HighestElevation() const {
 std::vector<airport> airportRepository::getAirportsWithMissingIata() const {
 	std::vector<airport> result;
 	for (const auto& a : airports) {
-		if (a.getIataCode().empty()) {
+		if (a.getIataCode().empty()) {//add all airports without an IATA code to the result vector
 			result.push_back(a);
 		}
 	}
@@ -268,22 +268,22 @@ std::vector<airport> airportRepository::getSortedAirports(int criteria, int orde
 	std::sort(sortedData.begin(), sortedData.end(), [criteria, orderChoice](const airport& a, const airport& b) {
 		//Ascending 
 		if (orderChoice == 1) {
-			if (criteria == 1) return a.getName() < b.getName();
-			if (criteria == 2) return a.getIsoCountry() < b.getIsoCountry();
-			if (criteria == 3) return a.getType() < b.getType();
-			if (criteria == 4) return a.getLatitude() < b.getLatitude();
-			if (criteria == 5) return a.getElevationInFeet() < b.getElevationInFeet();
+			if (criteria == 1) return a.getName() < b.getName();//sort airports by name in ascending order
+			if (criteria == 2) return a.getIsoCountry() < b.getIsoCountry();//sort airports by country in ascending order
+			if (criteria == 3) return a.getType() < b.getType();//sort airports by type in ascending order
+			if (criteria == 4) return a.getLatitude() < b.getLatitude();//sort airports by latitude in ascending order
+				if (criteria == 5) return a.getElevationInFeet() < b.getElevationInFeet();//sort airports by elevation in ascending order
 		}
 		//Descending
 		else {
-			if (criteria == 1) return a.getName() > b.getName();
-			if (criteria == 2) return a.getIsoCountry() > b.getIsoCountry();
-			if (criteria == 3) return a.getType() > b.getType();
-			if (criteria == 4) return a.getLatitude() > b.getLatitude();
-			if (criteria == 5) return a.getElevationInFeet() > b.getElevationInFeet();
+			if (criteria == 1) return a.getName() > b.getName();//sort airports by name in descending order
+			if (criteria == 2) return a.getIsoCountry() > b.getIsoCountry();//sort airports by country in descending order
+			if (criteria == 3) return a.getType() > b.getType();//sort airports by type in descending order
+			if (criteria == 4) return a.getLatitude() > b.getLatitude();//sort airports by latitude in descending order
+			if (criteria == 5) return a.getElevationInFeet() > b.getElevationInFeet();//sort airports by elevation in descending order
 		}
 		return false;
 		});
 
-	return sortedData;
+	return sortedData;//returns the sorted data
 }
