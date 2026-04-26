@@ -111,7 +111,7 @@ void airportRepository::loadFromCSV() {
 		catch (...) {
 		}
 	}
-	std::cout << "File read successfully!" << std::endl;//if no errors occur while reading the file, this will be outputted to the user
+	std::cout << "CSV File read successfully!" << std::endl;//if no errors occur while reading the file, this will be outputted to the user
 };
 void airportRepository::saveToCsv() const {
 	std::ofstream file("../airports.csv"); //opens the CSV file for writing

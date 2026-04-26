@@ -8,6 +8,7 @@ class AirportApp {
 public:
     void displayMainMenu();//function to display the main menu
     void displayAdditonalMenu(airportRepository& repo);//function to display the additional features menu
+    void displayAirportDetails(const airport& a);
 };
 
 #endif

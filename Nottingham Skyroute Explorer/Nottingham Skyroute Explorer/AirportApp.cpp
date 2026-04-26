@@ -44,8 +44,8 @@ void AirportApp::displayMainMenu() {
 					std::cout << "No airports matching the country code. Try again or type 'exit' to return to the main menu.";
 					continue;
 				}
-				for (const auto& entry : results) {//it gets the name of the airport with matching country code and outputs it to the user
-					std::cout << entry.second.getName() << "\n";
+				for (const auto& entry : results) {
+					displayAirportDetails(entry.second);
 				}
 				break;
 			}
@@ -64,7 +64,7 @@ void AirportApp::displayMainMenu() {
 					continue;
 				}
 				for (const auto& entry : results) {
-					std::cout << entry.second.getName() << "\n";
+					displayAirportDetails(entry.second);
 				}
 				break;
 			}
@@ -83,7 +83,7 @@ void AirportApp::displayMainMenu() {
 					continue;
 				}
 				for (const auto& entry : results) {
-					std::cout << entry.second.getName() << "\n";//gets the name of the airport with matching IATA Code
+					displayAirportDetails(entry.second);
 				}
 				break;
 			}
@@ -415,8 +415,8 @@ void AirportApp::displayAdditonalMenu(airportRepository& repo) {//displays the a
 
 			std::cout << "\n--- Sorted Results ---\n";
 			for (const auto& a : sorted) {
-				std::cout << a.getName() << " (" << a.getIsoCountry() << ") - "
-					<< a.getElevationInFeet() << " ft\n";
+				std::cout << a.getName() << " | Country: " << a.getIsoCountry() << " | Type: " << a.getType() << " | "
+					<< a.getElevationInFeet() << " ft\n" << "| Latitude: " << a.getLatitude() << "\n";//displays the name, country, elevation, type and latitude of the airports in the sorted list
 			}
 			break;
 		}
@@ -427,4 +427,13 @@ void AirportApp::displayAdditonalMenu(airportRepository& repo) {//displays the a
 			break;
 		}
 	}
+}
+void AirportApp::displayAirportDetails(const airport& a) {//method to display all the details of an airport
+	std::cout << "------------------------------------------" << std::endl;
+	std::cout << "Name: " << a.getName() << std::endl;
+	std::cout << "ID: " << a.getIdentifier() << " |Type: " << a.getType() << std::endl;
+	std::cout << "IATA: " << (a.getIataCode().empty() ? "N/A" : a.getIataCode()) << " |ICAO: " << (a.getIcaoCode().empty() ? "N/A" : a.getIcaoCode()) << std::endl;
+	std::cout << "Location: " << a.getMunicipality() << ", " << a.getIsoCountry() << " (" << a.getContinent() << ")" << std::endl;
+	std::cout << "Elevation: " << a.getElevationInFeet() << "ft" << "|Coordinates: " << a.getLatitude() << ", " << a.getLongitude() << std::endl; 
+	std::cout << "------------------------------------------" << std::endl;
 }
