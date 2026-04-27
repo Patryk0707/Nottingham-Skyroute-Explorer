@@ -1,7 +1,7 @@
 # Nottingham Skyroute Explorer
 This application will allow the user to seach for airports using a variety of ways. Display full airport details for search results and save all airports including new airport entries that the user can create allowing them to be viewed in the future. This program will have a simple console interface and handle any errors the user may come across
 
-Project is called Nottingham skyroute explorer
+Project is called Nottingham Skyroute explorer. It helps the user add airports, search airports, list airports or filter through airports. It has a simple interface that uses a range of numbers to continue through different parts of the features. The CSV file is read every time the program is ran. I used instances such as airport to store each row of the CSV and the repo instance to store the whole thing in a vector.
 The program runs in the window console and does not use any additional libraries
 Key features
 Main Features
