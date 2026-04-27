@@ -405,11 +405,21 @@ void AirportApp::displayAdditonalMenu(airportRepository& repo) {//displays the a
 			std::cout << "1. Name\n2. Country\n3. Type\n4. Latitude\n5. Elevation\n";
 			std::cout << "Enter choice(1-5): ";
 			std::cin >> sortChoice;
+			while (sortChoice > 5 or sortChoice < 1) {//input validation to make sure the user enters a number between 1 and 5
+				std::cin.ignore();
+				std::cout << "Please enter a number within 1-5";
+				std::cin >> sortChoice;
+			}
 
 			std::cout << "\nOrder:\n";
 			std::cout << "1. Ascending (A-Z)\n2. Descending (Z-A)\n";
 			std::cout << "Enter choice(1 or 2): ";
 			std::cin >> orderChoice;
+			while (orderChoice > 2 or orderChoice < 1) {//more input validation to make sure the user enters a number between 1 and 2
+				std::cin.ignore();
+				std::cout << "Please enter a number within 1-2";
+				std::cin >> orderChoice;
+			}
 
 			std::vector<airport> sorted = repo.getSortedAirports(sortChoice, orderChoice);//sorts airports using different filters and in ascending or descending order depending on the user input and then displays the sorted list to the user
 
